@@ -1,13 +1,20 @@
 (function () { 
-  var Request = require('./request');
-  var request = Request();
+
+  /* Module includes */
+  var Request = require('./request'),
+      Canvas = require('./canvas');
+
+  var request = Request(),
+      canvas = Canvas();
   
   function logResponse(response) {
     console.log(response);
   }
 
-  request.post({
-    'species': 0,
+  canvas.create('background');
+  canvas.create('foreground');
+
+  request.get({
     'mood': 'playful',
     'type': 'text',
     'input': 'yes'

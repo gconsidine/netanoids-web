@@ -1,26 +1,27 @@
 var Request = function() {
   
-  var _url = 'http://netanoids.greg-considine.com/api/',
-      _parameters = '';
+  /* 
+   * API Call format:
+   * http://api.greg-considine.com/netanoids/<species>/<mood>/<type>/<input>
+   */
+  var _url = 'http://api.greg-considine.com/netanoids/0/';
 
-  var post = function(o, callback) {
-    setParameters(o);    
-    
-    var xmlHttpRequest = new XMLHttpRequest();
+  var get = function(o, callback) {
+    var parameters = setParameters(o),
+        xmlHttpRequest = new XMLHttpRequest();
 
     xmlHttpRequest.onreadystatechange = function () {
       if(xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
-        console.log(xmlHttpRequest.responseText);
         callback(xmlHttpRequest.responseText);
       }
     }
 
-    xmlHttpRequest.open('GET', _url + _parameters, true);
+    xmlHttpRequest.open('GET', _url + parameters, true);
     xmlHttpRequest.send();
   }
   
   function setParameters(o) {
-    _parameters = o.species + '/' + o.mood + '/' + o.type + '/' + o.input; 
+    return o.mood + '/' + o.type + '/' + o.input; 
   }
 
   function setUrl(url) {
@@ -32,10 +33,11 @@ var Request = function() {
   }
 
   return {
-    post : post,
+    get : get,
     setUrl : setUrl,
     getUrl : getUrl
-  }
+  };
+
 };
 
 module.exports = Request;

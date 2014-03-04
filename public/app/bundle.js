@@ -30,15 +30,33 @@ var Canvas = function() {
 module.exports = Canvas;
 
 },{}],2:[function(require,module,exports){
+var Content = function() {
+
+};
+
+module.exports = Content;
+
+},{}],3:[function(require,module,exports){
+var Interact = function() {
+
+};
+
+module.exports = Interact;
+
+},{}],4:[function(require,module,exports){
 (function () { 
 
   /* Module includes */
-  var Request = require('./request'),
-      Canvas = require('./canvas');
+  var Request = require('./Request'),
+      Canvas = require('./Canvas');
 
   var request = Request(),
       canvas = Canvas();
-  
+
+  var gameLoop = (function () {
+    //window.setInterval(sayHi, 1000);
+  }());
+
   function logResponse(response) {
     console.log(response);
   }
@@ -54,7 +72,38 @@ module.exports = Canvas;
 
 }());
 
-},{"./canvas":1,"./request":3}],3:[function(require,module,exports){
+},{"./Canvas":1,"./Request":6}],5:[function(require,module,exports){
+var Mood = function() {
+  
+  var _mood = [],
+      _interval = 0;
+
+  (function () {
+    _mood = ['playful', 'depressed', 'zonked'];
+  }());
+
+  function setInterval() {
+    _interval = Math.floor(Math.random() * ((1000 * 60 * 60) + 1000));
+  }
+
+  function getMood() {
+    var index = Math.floor(Math.random() * 2); 
+  }
+
+  function getInterval() {
+    return _interval;
+  }
+  
+  return {
+    getMood : getMood,
+    getInterval : getInterval
+  };
+
+};
+
+module.exports = Mood;
+
+},{}],6:[function(require,module,exports){
 var Request = function() {
   
   /* 
@@ -99,4 +148,4 @@ var Request = function() {
 
 module.exports = Request;
 
-},{}]},{},[1,2,3])
+},{}]},{},[1,2,3,4,5,6])

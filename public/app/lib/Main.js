@@ -1,12 +1,16 @@
 (function () { 
 
   /* Module includes */
-  var Request = require('./request'),
-      Canvas = require('./canvas');
+  var Request = require('./Request'),
+      Canvas = require('./Canvas');
 
   var request = Request(),
       canvas = Canvas();
-  
+
+  var gameLoop = (function () {
+    //window.setInterval(sayHi, 1000);
+  }());
+
   function logResponse(response) {
     console.log(response);
   }

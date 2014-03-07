@@ -1,4 +1,5 @@
 var Canvas = function() {
+  var Mood = require('./Interact');
 
   var _width = document.documentElement.clientWidth,
       _height = document.documentElement.clientHeight;

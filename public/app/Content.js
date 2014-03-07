@@ -1,4 +1,5 @@
 var Content = function() {
+  var Mood = require('./Interact');
 
 };
 

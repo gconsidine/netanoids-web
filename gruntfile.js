@@ -8,7 +8,7 @@ module.exports = function (grunt) {
     browserify: {
       dist: {
         files: {
-          "public/app/bundle.js": ["public/app/*/*.js"]
+          "public/bundle.js": ["public/app/*.js"]
         }
       }
     },
@@ -16,7 +16,7 @@ module.exports = function (grunt) {
     /* Watch for JavaScript changes to automatically Browserify */
     watch: {
       scripts: {
-        files: ["public/app/*/*.js"],
+        files: ["public/app/*.js"],
         tasks: ["browserify"],
         options: {
           debounceDelay: 1000

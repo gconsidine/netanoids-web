@@ -1,5 +1,4 @@
 (function () { 
-
   var Interact = require('./Interact');
 
   var _interact;

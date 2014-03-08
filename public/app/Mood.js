@@ -1,10 +1,10 @@
 var Mood = function() {
   
-  var _mood = [],
-      _interval = 0;
+  var _mood,
+      _interval;
 
   (function () {
-    _mood = ['playful', 'depressed', 'zonked'];
+    _moods = ['playful', 'depressed', 'zonked'];
     setInterval();
     setMood();
   }());
@@ -15,11 +15,11 @@ var Mood = function() {
 
   function setMood() {
     var index = Math.floor(Math.random() * 2); 
-    _mood = _mood[index]; 
+    _mood = _moods[index]; 
   }
 
   function getMood() {
-    return _mood[index];
+    return _mood;
   }
 
   function getInterval() {
@@ -29,7 +29,7 @@ var Mood = function() {
   function update() {
     setInterval();
     setMood();
-    window.setTimeout(_mood.update, _mood.getInterval());
+    window.setTimeout(update, getInterval());
   }
   
   return {

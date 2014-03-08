@@ -2,12 +2,12 @@ var Interact = function() {
 
   var Mood = require('./Mood'),
       Request = require('./Request'),
-      Canvas = require('./Canvas'),
-      Content = require('./Content');
+      Content = require('./Content'),
+      Background = require('./Background'),
+      Actor = require('./Actor');
 
   var mood, 
       request, 
-      canvas,
       content;
 
   var _questions = [],
@@ -21,8 +21,9 @@ var Interact = function() {
   (function () {
     mood = Mood();
     request = Request();
-    canvas = Canvas();
     content = Content();
+    actor = Actor();
+    background = Background();
 
     _type = ['text', 'image', 'video'];
 
@@ -31,10 +32,11 @@ var Interact = function() {
     setNegativeResponses();
     setInterval();
     setType();
+    background.draw();
   }());
 
   function setQuestions() {
-    var currentMood = Mood.getMood();
+    var currentMood = mood.getMood();
     
     switch(currentMood){
       case 'playful':
@@ -63,7 +65,7 @@ var Interact = function() {
   }
 
   function setPositiveResponses() {
-    var currentMood = Mood.getMood(); 
+    var currentMood = mood.getMood(); 
 
     switch(currentMood){
       case 'playful':
@@ -92,7 +94,7 @@ var Interact = function() {
   }
 
   function setNegativeResponses() {
-    var currentMood = Mood.getMood(); 
+    var currentMood = mood.getMood(); 
 
     switch(currentMood){
       case 'playful':
@@ -153,7 +155,7 @@ var Interact = function() {
   function update() {
     setInterval();
     setType();
-    window.setTimeout(_interact.update, _interact.getInterval());
+    window.setTimeout(update, getInterval());
   }
   
   return {
@@ -164,7 +166,8 @@ var Interact = function() {
     update: update,
     mood: mood,
     content: content,
-    canvas: canvas,
+    backgournd: background,
+    actor: actor,
     request: request
   };
 

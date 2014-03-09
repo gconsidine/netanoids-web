@@ -2,37 +2,37 @@ var Interact = function() {
 
   var Mood = require('./Mood'),
       Request = require('./Request'),
-      Content = require('./Content'),
-      Background = require('./Background'),
-      Actor = require('./Actor');
+      Content = require('./Content');
+
+  var _questions,
+      _negativeResponses,
+      _positiveResponses,
+      _types,
+      _type,
+      _interval,
+      _response,
+      _prompted;
 
   var mood, 
       request, 
       content;
 
-  var _questions = [],
-      _negativeResponses = [],
-      _positiveResponses = [],
-      _type = [],
-      _interval = 0,
-      _response = false,
-      _prompted = false;
-
   (function () {
     mood = Mood();
     request = Request();
     content = Content();
-    actor = Actor();
-    background = Background();
 
-    _type = ['text', 'image', 'video'];
+    _types = ['text', 'image', 'video'];
 
     setQuestions();
     setPositiveResponses();
     setNegativeResponses();
     setInterval();
     setType();
-    background.draw();
+    
+    content.background.update();
+    content.actor.update(mood.getMood());
+    content.displayVideo();
   }());
 
   function setQuestions() {
@@ -131,7 +131,7 @@ var Interact = function() {
 
   function setType() {
     var index = Math.floor(Math.random() * 2); 
-    _type = _type[index]; 
+    _type = _types[index]; 
   }
 
   function setInterval() {
@@ -152,10 +152,25 @@ var Interact = function() {
   function handleInput() {
   }
 
-  function update() {
+  function startMoodLoop() {
+    updateInteraction();
+  }
+
+  function startInteractionLoop() {
+    updateMood();
+  }
+
+  function updateInteraction() {
     setInterval();
     setType();
-    window.setTimeout(update, getInterval());
+    console.log('Interaction', getType(), getInterval());
+    window.setTimeout(updateInteraction, getInterval());
+  }
+
+  function updateMood() {
+    mood.update(updateMood);
+    console.log('Mood', mood.getMood(), mood.getInterval());
+    content.actor.update(mood.getMood());
   }
   
   return {
@@ -163,11 +178,10 @@ var Interact = function() {
     getInterval:  getInterval,
     getPositiveResponse: getPositiveResponse,
     getNegativeResponse: getNegativeResponse,
-    update: update,
+    startInteractionLoop: startInteractionLoop,
+    startMoodLoop: startMoodLoop,
     mood: mood,
     content: content,
-    backgournd: background,
-    actor: actor,
     request: request
   };
 

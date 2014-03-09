@@ -10,7 +10,7 @@ var Mood = function() {
   }());
 
   function setInterval() {
-    _interval = Math.floor(Math.random() * ((1000 * 60 * 60) + 1000));
+    _interval = Math.floor(Math.random() * ((100 * 60 * 60) + 1000));
   }
 
   function setMood() {
@@ -26,10 +26,10 @@ var Mood = function() {
     return _interval;
   }
   
-  function update() {
+  function update(callback) {
     setInterval();
     setMood();
-    window.setTimeout(update, getInterval());
+    window.setTimeout(callback, getInterval());
   }
   
   return {

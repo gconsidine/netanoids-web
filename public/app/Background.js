@@ -1,64 +1,64 @@
 var Background = function() {
   var Canvas = require('./Canvas');
+  
+  var CONTENT_PADDING = 9;
+  
+  var _canvas,
+      _startX,
+      _startY,
+      _hLength,
+      _vLength,
+      _shift,
+      _depth,
+      _bg;
 
-  var canvas,
-      startX,
-      startY,
-      hLength,
-      vLength,
-      shift,
-      depth,
-      contentX,
+  var contentX,
       contentY,
       contentWidth,
       contentHeight;
-  
-  var _bg;
-  
+
   (function() {
-    canvas = Canvas();
+    _canvas = Canvas();
 
-    _bg = canvas.create('background');
+    _bg = _canvas.create('background');
     
-    startX = _bg.width * 0.01;
-    startY = _bg.height * 0.1;
-    hLength = _bg.width * 0.9;
-    vLength = _bg.height * 0.5;
-    depth = _bg.width * 0.01,
-    shift = depth * Math.cos(Math.PI / 180);
+    _startX = _bg.width * 0.01;
+    _startY = _bg.height * 0.1;
+    _hLength = _bg.width * 0.9;
+    _vLength = _bg.height * 0.5;
+    _depth = _bg.width * 0.01,
+    _shift = _depth * Math.cos(Math.PI / 180);
 
-    contentX = startX + shift + shift/2;
-    contentY = startY + shift + shift/2;
-    contentWidth = Math.floor(hLength - (shift * 2));
-    contentHeight = Math.floor(vLength - (shift * 2)); 
+    contentX = Math.floor(_startX + CONTENT_PADDING + _shift);
+    contentY = Math.floor(_startY + CONTENT_PADDING + _shift);
+    contentWidth = Math.floor(_hLength - (_shift * 2));
+    contentHeight = Math.floor(_vLength - (_shift * 2)); 
   }());
 
-  function draw() {
+  function update() {
     drawProjector(); 
-    loadVideo();
   }
 
   function drawProjector() {
-    var x = startX,
-        y = startY;
+    var x = _startX,
+        y = _startY;
     
     _bg.ctx.beginPath();
 
     // Square
     _bg.ctx.moveTo(x, y);
-    _bg.ctx.lineTo(x += hLength, y);
-    _bg.ctx.lineTo(x, y += vLength);
-    _bg.ctx.lineTo(x -= hLength, y);
-    _bg.ctx.lineTo(x, y -= vLength);
+    _bg.ctx.lineTo(x += _hLength, y);
+    _bg.ctx.lineTo(x, y += _vLength);
+    _bg.ctx.lineTo(x -= _hLength, y);
+    _bg.ctx.lineTo(x, y -= _vLength);
 
     // Square becomes cube
-    _bg.ctx.lineTo(x += shift, y -= shift); 
-    _bg.ctx.lineTo(x += hLength, y);
-    _bg.ctx.lineTo(x -= shift, y += shift);
-    _bg.ctx.lineTo(x += shift, y -= shift);
-    _bg.ctx.lineTo(x, y += vLength);
-    _bg.ctx.lineTo(x -= shift, y += shift);
-
+    _bg.ctx.lineTo(x += _shift, y -= _shift); 
+    _bg.ctx.lineTo(x += _hLength, y);
+    _bg.ctx.lineTo(x -= _shift, y += _shift);
+    _bg.ctx.lineTo(x += _shift, y -= _shift);
+    _bg.ctx.lineTo(x, y += _vLength);
+    _bg.ctx.lineTo(x -= _shift, y += _shift);
 
     // Fill
     _bg.ctx.strokeStyle = 'black';
@@ -69,11 +69,11 @@ var Background = function() {
     _bg.ctx.beginPath();
    
     // TV-like inset
-    _bg.ctx.moveTo(x -= shift, y -= shift);
-    _bg.ctx.lineTo(x, y = (y - vLength) + shift * 2);
-    _bg.ctx.lineTo(x = (x - hLength) + shift * 2, y); 
-    _bg.ctx.lineTo(x, y = (y + vLength) - shift * 2);
-    _bg.ctx.lineTo(x = (x + hLength) - shift * 2, y);
+    _bg.ctx.moveTo(x -= _shift, y -= _shift);
+    _bg.ctx.lineTo(x, y = (y - _vLength) + _shift * 2);
+    _bg.ctx.lineTo(x = (x - _hLength) + _shift * 2, y); 
+    _bg.ctx.lineTo(x, y = (y + _vLength) - _shift * 2);
+    _bg.ctx.lineTo(x = (x + _hLength) - _shift * 2, y);
     
     // Fill
     _bg.ctx.strokeStyle = 'black';
@@ -83,23 +83,12 @@ var Background = function() {
     _bg.ctx.closePath();
   }
 
-  function loadVideo() {
-    var div = document.createElement('div');  
-    div.id = 'video';
-    div.style.height = contentHeight + 'px';
-    div.style.width = contentWidth + 'px';
-    div.setAttribute('style', 'position: absolute; top:' + contentY + 'px; left:' + contentX + 'px;');
-
-    div.innerHTML = '<iframe width="' + contentWidth + '" height="' + contentHeight + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1" frameborder="0" allowfullscreen></iframe>';
-    document.body.appendChild(div);
-  }
-
   return {
-    x: startX,
-    y: startY,
-    width: hLength,
-    height: vLength,
-    draw: draw
+    x: contentX,
+    y: contentY,
+    width: contentWidth,
+    height: contentHeight,
+    update: update
   };
   
 };

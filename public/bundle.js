@@ -2,6 +2,53 @@
 var Actor = function() {
   var Canvas = require('./Canvas');
 
+  var ACTOR_HEIGHT = 20;
+
+  var _canvas,
+      _startX,
+      _startY,
+      _colors;
+
+  (function() {
+    _canvas = Canvas();
+    _fg = _canvas.create('actor');
+
+    _colors = {
+      playful: 'green', 
+      depressed: 'black', 
+      zonked: 'pink'
+    };
+
+    _startX = _fg.width / 2;
+    _startY = _fg.height - ACTOR_HEIGHT; 
+  }());
+  
+  function draw(mood) {
+    color = getColorFromMood(mood);
+
+    _fg.ctx.beginPath();
+    _fg.ctx.moveTo(_startX, _fg.height);
+    _fg.ctx.lineTo(_startX, _startY);
+
+    _fg.ctx.strokeStyle = color;
+    _fg.ctx.lineWidth = 3;
+    _fg.ctx.stroke();
+
+    _fg.ctx.closePath();
+  }
+
+  function update(mood) {
+    draw(mood);
+  }
+
+  function getColorFromMood(mood) {
+    return _colors[mood]; 
+  }
+  
+  return {
+    update: update
+  };
+ 
 };
 
 module.exports = Actor;
@@ -9,65 +56,65 @@ module.exports = Actor;
 },{"./Canvas":3}],2:[function(require,module,exports){
 var Background = function() {
   var Canvas = require('./Canvas');
+  
+  var CONTENT_PADDING = 9;
+  
+  var _canvas,
+      _startX,
+      _startY,
+      _hLength,
+      _vLength,
+      _shift,
+      _depth,
+      _bg;
 
-  var canvas,
-      startX,
-      startY,
-      hLength,
-      vLength,
-      shift,
-      depth,
-      contentX,
+  var contentX,
       contentY,
       contentWidth,
       contentHeight;
-  
-  var _bg;
-  
+
   (function() {
-    canvas = Canvas();
+    _canvas = Canvas();
 
-    _bg = canvas.create('background');
+    _bg = _canvas.create('background');
     
-    startX = _bg.width * 0.01;
-    startY = _bg.height * 0.1;
-    hLength = _bg.width * 0.9;
-    vLength = _bg.height * 0.5;
-    depth = _bg.width * 0.01,
-    shift = depth * Math.cos(Math.PI / 180);
+    _startX = _bg.width * 0.01;
+    _startY = _bg.height * 0.1;
+    _hLength = _bg.width * 0.9;
+    _vLength = _bg.height * 0.5;
+    _depth = _bg.width * 0.01,
+    _shift = _depth * Math.cos(Math.PI / 180);
 
-    contentX = startX + shift + shift/2;
-    contentY = startY + shift + shift/2;
-    contentWidth = Math.floor(hLength - (shift * 2));
-    contentHeight = Math.floor(vLength - (shift * 2)); 
+    contentX = Math.floor(_startX + CONTENT_PADDING + _shift);
+    contentY = Math.floor(_startY + CONTENT_PADDING + _shift);
+    contentWidth = Math.floor(_hLength - (_shift * 2));
+    contentHeight = Math.floor(_vLength - (_shift * 2)); 
   }());
 
-  function draw() {
+  function update() {
     drawProjector(); 
-    loadVideo();
   }
 
   function drawProjector() {
-    var x = startX,
-        y = startY;
+    var x = _startX,
+        y = _startY;
     
     _bg.ctx.beginPath();
 
     // Square
     _bg.ctx.moveTo(x, y);
-    _bg.ctx.lineTo(x += hLength, y);
-    _bg.ctx.lineTo(x, y += vLength);
-    _bg.ctx.lineTo(x -= hLength, y);
-    _bg.ctx.lineTo(x, y -= vLength);
+    _bg.ctx.lineTo(x += _hLength, y);
+    _bg.ctx.lineTo(x, y += _vLength);
+    _bg.ctx.lineTo(x -= _hLength, y);
+    _bg.ctx.lineTo(x, y -= _vLength);
 
     // Square becomes cube
-    _bg.ctx.lineTo(x += shift, y -= shift); 
-    _bg.ctx.lineTo(x += hLength, y);
-    _bg.ctx.lineTo(x -= shift, y += shift);
-    _bg.ctx.lineTo(x += shift, y -= shift);
-    _bg.ctx.lineTo(x, y += vLength);
-    _bg.ctx.lineTo(x -= shift, y += shift);
-
+    _bg.ctx.lineTo(x += _shift, y -= _shift); 
+    _bg.ctx.lineTo(x += _hLength, y);
+    _bg.ctx.lineTo(x -= _shift, y += _shift);
+    _bg.ctx.lineTo(x += _shift, y -= _shift);
+    _bg.ctx.lineTo(x, y += _vLength);
+    _bg.ctx.lineTo(x -= _shift, y += _shift);
 
     // Fill
     _bg.ctx.strokeStyle = 'black';
@@ -78,11 +125,11 @@ var Background = function() {
     _bg.ctx.beginPath();
    
     // TV-like inset
-    _bg.ctx.moveTo(x -= shift, y -= shift);
-    _bg.ctx.lineTo(x, y = (y - vLength) + shift * 2);
-    _bg.ctx.lineTo(x = (x - hLength) + shift * 2, y); 
-    _bg.ctx.lineTo(x, y = (y + vLength) - shift * 2);
-    _bg.ctx.lineTo(x = (x + hLength) - shift * 2, y);
+    _bg.ctx.moveTo(x -= _shift, y -= _shift);
+    _bg.ctx.lineTo(x, y = (y - _vLength) + _shift * 2);
+    _bg.ctx.lineTo(x = (x - _hLength) + _shift * 2, y); 
+    _bg.ctx.lineTo(x, y = (y + _vLength) - _shift * 2);
+    _bg.ctx.lineTo(x = (x + _hLength) - _shift * 2, y);
     
     // Fill
     _bg.ctx.strokeStyle = 'black';
@@ -92,23 +139,12 @@ var Background = function() {
     _bg.ctx.closePath();
   }
 
-  function loadVideo() {
-    var div = document.createElement('div');  
-    div.id = 'video';
-    div.style.height = contentHeight + 'px';
-    div.style.width = contentWidth + 'px';
-    div.setAttribute('style', 'position: absolute; top:' + contentY + 'px; left:' + contentX + 'px;');
-
-    div.innerHTML = '<iframe width="' + contentWidth + '" height="' + contentHeight + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1" frameborder="0" allowfullscreen></iframe>';
-    document.body.appendChild(div);
-  }
-
   return {
-    x: startX,
-    y: startY,
-    width: hLength,
-    height: vLength,
-    draw: draw
+    x: contentX,
+    y: contentY,
+    width: contentWidth,
+    height: contentHeight,
+    update: update
   };
   
 };
@@ -156,62 +192,76 @@ module.exports = Canvas;
 
 },{}],4:[function(require,module,exports){
 var Content = function() {
+  Background = require('./Background');
+  Actor = require('./Actor');
   
-  function displayVideo(o) {
-    /*
-    var div = document.createElement('div');
+  var background,
+      actor;
 
+  (function() {
+    background = Background();  
+    actor = Actor();
+  }());
+
+  function displayVideo() {
+    var div = document.createElement('div');  
     div.id = 'video';
-    div.setAttribute('style', 'width: ' + Math.floor(o.width) + 'px; height: ' + Math.floor(o.height) + 'px');
+    div.style.height = background.height + 'px';
+    div.style.width = background.width + 'px';
+    div.setAttribute('style', 'position: absolute; top:' + background.y + 'px; left:' + background.x + 'px;');
 
-    div.innerHTML = '<iframe width="560" height="315" src="//www.youtube.com/embed/OO-vG8oPhhM?list=PL5gcv_l9e7VWkjF3ft6Cv6E9N5jyIIlp_" frameborder="0" allowfullscreen></iframe>';
-    djcument.body.insertBefore(div, document.getElementsByTagName('script')[0]);
-    */
+    div.innerHTML = '<iframe width="' + background.width + '" height="' + background.height 
+                  + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1"' 
+                  + 'frameborder="0" allowfullscreen></iframe>';
+
+    document.body.appendChild(div);
   }
 
   return {
-    displayVideo: displayVideo
+    displayVideo: displayVideo,
+    background: background,
+    actor: actor
   };
 };
 
 module.exports = Content;
 
-},{}],5:[function(require,module,exports){
+},{"./Actor":1,"./Background":2}],5:[function(require,module,exports){
 var Interact = function() {
 
   var Mood = require('./Mood'),
       Request = require('./Request'),
-      Content = require('./Content'),
-      Background = require('./Background'),
-      Actor = require('./Actor');
+      Content = require('./Content');
+
+  var _questions,
+      _negativeResponses,
+      _positiveResponses,
+      _types,
+      _type,
+      _interval,
+      _response,
+      _prompted;
 
   var mood, 
       request, 
       content;
 
-  var _questions = [],
-      _negativeResponses = [],
-      _positiveResponses = [],
-      _type = [],
-      _interval = 0,
-      _response = false,
-      _prompted = false;
-
   (function () {
     mood = Mood();
     request = Request();
     content = Content();
-    actor = Actor();
-    background = Background();
 
-    _type = ['text', 'image', 'video'];
+    _types = ['text', 'image', 'video'];
 
     setQuestions();
     setPositiveResponses();
     setNegativeResponses();
     setInterval();
     setType();
-    background.draw();
+    
+    content.background.update();
+    content.actor.update(mood.getMood());
+    content.displayVideo();
   }());
 
   function setQuestions() {
@@ -310,7 +360,7 @@ var Interact = function() {
 
   function setType() {
     var index = Math.floor(Math.random() * 2); 
-    _type = _type[index]; 
+    _type = _types[index]; 
   }
 
   function setInterval() {
@@ -331,10 +381,25 @@ var Interact = function() {
   function handleInput() {
   }
 
-  function update() {
+  function startMoodLoop() {
+    updateInteraction();
+  }
+
+  function startInteractionLoop() {
+    updateMood();
+  }
+
+  function updateInteraction() {
     setInterval();
     setType();
-    window.setTimeout(update, getInterval());
+    console.log('Interaction', getType(), getInterval());
+    window.setTimeout(updateInteraction, getInterval());
+  }
+
+  function updateMood() {
+    mood.update(updateMood);
+    console.log('Mood', mood.getMood(), mood.getInterval());
+    content.actor.update(mood.getMood());
   }
   
   return {
@@ -342,11 +407,10 @@ var Interact = function() {
     getInterval:  getInterval,
     getPositiveResponse: getPositiveResponse,
     getNegativeResponse: getNegativeResponse,
-    update: update,
+    startInteractionLoop: startInteractionLoop,
+    startMoodLoop: startMoodLoop,
     mood: mood,
     content: content,
-    backgournd: background,
-    actor: actor,
     request: request
   };
 
@@ -354,7 +418,7 @@ var Interact = function() {
 
 module.exports = Interact;
 
-},{"./Actor":1,"./Background":2,"./Content":4,"./Mood":7,"./Request":8}],6:[function(require,module,exports){
+},{"./Content":4,"./Mood":7,"./Request":8}],6:[function(require,module,exports){
 (function () { 
   var Interact = require('./Interact');
 
@@ -365,8 +429,8 @@ module.exports = Interact;
   (function () {
     _interact = Interact(); 
 
-    _interact.mood.update();
-    _interact.update();
+    _interact.startMoodLoop();
+    _interact.startInteractionLoop();
 
     window.setInterval(gameLoop, GAME_UPDATE_INTERVAL);
   }());
@@ -390,7 +454,7 @@ var Mood = function() {
   }());
 
   function setInterval() {
-    _interval = Math.floor(Math.random() * ((1000 * 60 * 60) + 1000));
+    _interval = Math.floor(Math.random() * ((100 * 60 * 60) + 1000));
   }
 
   function setMood() {
@@ -406,10 +470,10 @@ var Mood = function() {
     return _interval;
   }
   
-  function update() {
+  function update(callback) {
     setInterval();
     setMood();
-    window.setTimeout(update, getInterval());
+    window.setTimeout(callback, getInterval());
   }
   
   return {

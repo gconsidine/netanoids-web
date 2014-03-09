@@ -1,19 +1,33 @@
 var Content = function() {
+  Background = require('./Background');
+  Actor = require('./Actor');
   
-  function displayVideo(o) {
-    /*
-    var div = document.createElement('div');
+  var background,
+      actor;
 
+  (function() {
+    background = Background();  
+    actor = Actor();
+  }());
+
+  function displayVideo() {
+    var div = document.createElement('div');  
     div.id = 'video';
-    div.setAttribute('style', 'width: ' + Math.floor(o.width) + 'px; height: ' + Math.floor(o.height) + 'px');
+    div.style.height = background.height + 'px';
+    div.style.width = background.width + 'px';
+    div.setAttribute('style', 'position: absolute; top:' + background.y + 'px; left:' + background.x + 'px;');
 
-    div.innerHTML = '<iframe width="560" height="315" src="//www.youtube.com/embed/OO-vG8oPhhM?list=PL5gcv_l9e7VWkjF3ft6Cv6E9N5jyIIlp_" frameborder="0" allowfullscreen></iframe>';
-    djcument.body.insertBefore(div, document.getElementsByTagName('script')[0]);
-    */
+    div.innerHTML = '<iframe width="' + background.width + '" height="' + background.height 
+                  + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1"' 
+                  + 'frameborder="0" allowfullscreen></iframe>';
+
+    document.body.appendChild(div);
   }
 
   return {
-    displayVideo: displayVideo
+    displayVideo: displayVideo,
+    background: background,
+    actor: actor
   };
 };
 

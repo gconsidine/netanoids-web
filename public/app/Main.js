@@ -8,8 +8,8 @@
   (function () {
     _interact = Interact(); 
 
-    _interact.mood.update();
-    _interact.update();
+    _interact.startMoodLoop();
+    _interact.startInteractionLoop();
 
     window.setInterval(gameLoop, GAME_UPDATE_INTERVAL);
   }());

@@ -15,6 +15,7 @@ var Canvas = function() {
     canvas.width = width;
     canvas.height = height;
     canvas.id = id;
+    canvas.setAttribute('style', 'position:absolute;');
 
     document.body.insertBefore(canvas, document.body.childNodes[0]);
 

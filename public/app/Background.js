@@ -5,7 +5,13 @@ var Background = function() {
       startX,
       startY,
       hLength,
-      vLength;
+      vLength,
+      shift,
+      depth,
+      contentX,
+      contentY,
+      contentWidth,
+      contentHeight;
   
   var _bg;
   
@@ -18,18 +24,24 @@ var Background = function() {
     startY = _bg.height * 0.1;
     hLength = _bg.width * 0.9;
     vLength = _bg.height * 0.5;
+    depth = _bg.width * 0.01,
+    shift = depth * Math.cos(Math.PI / 180);
+
+    contentX = startX + shift + shift/2;
+    contentY = startY + shift + shift/2;
+    contentWidth = Math.floor(hLength - (shift * 2));
+    contentHeight = Math.floor(vLength - (shift * 2)); 
   }());
 
   function draw() {
     drawProjector(); 
+    loadVideo();
   }
 
   function drawProjector() {
     var x = startX,
-        y = startY,
-        depth = _bg.width * 0.01,
-        shift = depth * Math.cos(Math.PI / 180);
-
+        y = startY;
+    
     _bg.ctx.beginPath();
 
     // Square
@@ -67,6 +79,19 @@ var Background = function() {
     _bg.ctx.strokeStyle = 'black';
     _bg.ctx.lineWidth = 1;
     _bg.ctx.stroke();
+
+    _bg.ctx.closePath();
+  }
+
+  function loadVideo() {
+    var div = document.createElement('div');  
+    div.id = 'video';
+    div.style.height = contentHeight + 'px';
+    div.style.width = contentWidth + 'px';
+    div.setAttribute('style', 'position: absolute; top:' + contentY + 'px; left:' + contentX + 'px;');
+
+    div.innerHTML = '<iframe width="' + contentWidth + '" height="' + contentHeight + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1" frameborder="0" allowfullscreen></iframe>';
+    document.body.appendChild(div);
   }
 
   return {

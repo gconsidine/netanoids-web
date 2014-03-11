@@ -38,26 +38,34 @@ var Content = function() {
       return false;
     }
 
-    if(response.error) {
+    if(json.status === 'fail') {
       displayError();
       return false;
     }
 
     if(o.type === 'video') {
+
       html = '<iframe width="' + background.width + '" height="' + background.height 
-           + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1"' 
+           + '" src="http://www.youtube.com/embed/' + json.content + '?autoplay=1"' 
            + 'frameborder="0" allowfullscreen></iframe>';
+
     } else if(o.type === 'image') {
-      html = response;
+
+      html = '<img width="auto" height="' + background.height + '" src="' + decodeURIComponent(json.content) + '" />'
+
     } else if(o.type === 'text') {
-      html = response; 
+
+      html = '<p><em>' + json.title + '</em></p><p>' + json.content + '</p>';
+
     }
 
     div = document.createElement('div');  
     div.id = 'content';
     div.style.height = background.height + 'px';
     div.style.width = background.width + 'px';
-    div.setAttribute('style', 'position: absolute; top:' + background.y + 'px; left:' + background.x + 'px;');
+    div.setAttribute('style', 'width: ' + background.width + 'px; height: ' + background.height 
+                     + 'px; text-align: center; position: absolute; top:' + background.y 
+                     + 'px; left:' + background.x + 'px;');
 
     div.innerHTML = html;
 

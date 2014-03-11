@@ -29,11 +29,13 @@ var Actor = function() {
 
     _fg.ctx.beginPath();
     _fg.ctx.moveTo(_startX, _startY);
-    _fg.ctx.lineTo(_startX, _startY - ACTOR_HEIGHT);
+    _fg.ctx.arc(_startX, _startY - ACTOR_HEIGHT, ACTOR_HEIGHT, 0, 2 * Math.PI, false);
 
     _fg.ctx.strokeStyle = color;
+    _fg.ctx.fillStyle = color;
     _fg.ctx.lineWidth = 3;
     _fg.ctx.stroke();
+    _fg.ctx.fill();
 
     _fg.ctx.closePath();
   }
@@ -232,26 +234,34 @@ var Content = function() {
       return false;
     }
 
-    if(response.error) {
+    if(json.status === 'fail') {
       displayError();
       return false;
     }
 
     if(o.type === 'video') {
+
       html = '<iframe width="' + background.width + '" height="' + background.height 
-           + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1"' 
+           + '" src="http://www.youtube.com/embed/' + json.content + '?autoplay=1"' 
            + 'frameborder="0" allowfullscreen></iframe>';
+
     } else if(o.type === 'image') {
-      html = response;
+
+      html = '<img width="auto" height="' + background.height + '" src="' + decodeURIComponent(json.content) + '" />'
+
     } else if(o.type === 'text') {
-      html = response; 
+
+      html = '<p><em>' + json.title + '</em></p><p>' + json.content + '</p>';
+
     }
 
     div = document.createElement('div');  
     div.id = 'content';
     div.style.height = background.height + 'px';
     div.style.width = background.width + 'px';
-    div.setAttribute('style', 'position: absolute; top:' + background.y + 'px; left:' + background.x + 'px;');
+    div.setAttribute('style', 'width: ' + background.width + 'px; height: ' + background.height 
+                     + 'px; text-align: center; position: absolute; top:' + background.y 
+                     + 'px; left:' + background.x + 'px;');
 
     div.innerHTML = html;
 
@@ -473,7 +483,7 @@ var Interact = function() {
   }
 
   function setType() {
-    var index = Math.floor(Math.random() * 2); 
+    var index = Math.floor(Math.random() * 3); 
     _type = _types[index]; 
   }
 
@@ -599,7 +609,7 @@ var Mood = function() {
   }
 
   function setMood() {
-    var index = Math.floor(Math.random() * 2); 
+    var index = Math.floor(Math.random() * 3); 
     _mood = _moods[index]; 
   }
 

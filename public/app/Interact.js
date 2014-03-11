@@ -134,7 +134,7 @@ var Interact = function() {
   }
 
   function setType() {
-    var index = Math.floor(Math.random() * 2); 
+    var index = Math.floor(Math.random() * 3); 
     _type = _types[index]; 
   }
 

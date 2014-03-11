@@ -28,11 +28,13 @@ var Actor = function() {
 
     _fg.ctx.beginPath();
     _fg.ctx.moveTo(_startX, _startY);
-    _fg.ctx.lineTo(_startX, _startY - ACTOR_HEIGHT);
+    _fg.ctx.arc(_startX, _startY - ACTOR_HEIGHT, ACTOR_HEIGHT, 0, 2 * Math.PI, false);
 
     _fg.ctx.strokeStyle = color;
+    _fg.ctx.fillStyle = color;
     _fg.ctx.lineWidth = 3;
     _fg.ctx.stroke();
+    _fg.ctx.fill();
 
     _fg.ctx.closePath();
   }

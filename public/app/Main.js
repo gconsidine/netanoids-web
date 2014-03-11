@@ -1,15 +1,15 @@
-(function () { 
+var global = (function () { 
   var Interact = require('./Interact');
 
-  var _interact;
+  var interact;
 
   var GAME_UPDATE_INTERVAL = 33;
   
   (function () {
-    _interact = Interact(); 
+    interact = Interact(); 
 
-    _interact.startMoodLoop();
-    _interact.startInteractionLoop();
+    interact.startMoodLoop();
+    interact.startInteractionLoop();
 
     window.setInterval(gameLoop, GAME_UPDATE_INTERVAL);
   }());
@@ -17,5 +17,9 @@
   function gameLoop() {
 
   }
+
+  return {
+    interact: interact
+  };
 
 }());

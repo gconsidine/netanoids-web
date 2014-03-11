@@ -1,7 +1,8 @@
 var Actor = function() {
   var Canvas = require('./Canvas');
 
-  var ACTOR_HEIGHT = 20;
+  var ACTOR_HEIGHT = 20,
+      BOTTOM_PADDING = 30;
 
   var _canvas,
       _startX,
@@ -19,15 +20,15 @@ var Actor = function() {
     };
 
     _startX = _fg.width / 2;
-    _startY = _fg.height - ACTOR_HEIGHT; 
+    _startY = _fg.height - BOTTOM_PADDING; 
   }());
   
   function draw(mood) {
     color = getColorFromMood(mood);
 
     _fg.ctx.beginPath();
-    _fg.ctx.moveTo(_startX, _fg.height);
-    _fg.ctx.lineTo(_startX, _startY);
+    _fg.ctx.moveTo(_startX, _startY);
+    _fg.ctx.lineTo(_startX, _startY - ACTOR_HEIGHT);
 
     _fg.ctx.strokeStyle = color;
     _fg.ctx.lineWidth = 3;

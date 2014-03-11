@@ -32,7 +32,6 @@ var Interact = function() {
     
     content.background.update();
     content.actor.update(mood.getMood());
-    content.displayVideo();
   }());
 
   function setQuestions() {
@@ -48,7 +47,7 @@ var Interact = function() {
         break;
       case 'depressed':
         _questions = {
-          text: 'You probably don\'t but, want to read something I found?', 
+          text: 'You probably don\'t, but, want to read something I found?', 
           image: 'This picture bums me out... Want to look?', 
           video: 'This video would be good on a rainy day. Want to watch?'
         };
@@ -62,6 +61,11 @@ var Interact = function() {
         };
         break;
     }
+  }
+  
+  function setResponses() {
+    setPositiveResponses();
+    setNegativeResponses();
   }
 
   function setPositiveResponses() {
@@ -146,24 +150,22 @@ var Interact = function() {
     return _interval;
   }
   
-  function promptUser() {
-  }
-
-  function handleInput() {
-  }
-
   function startMoodLoop() {
-    updateInteraction();
+    updateMood();
   }
 
   function startInteractionLoop() {
-    updateMood();
+    window.setTimeout(updateInteraction, Math.floor(Math.random() * ((10 * 60 * 60) + 1000)));
   }
 
   function updateInteraction() {
     setInterval();
     setType();
+
     console.log('Interaction', getType(), getInterval());
+
+    content.displayQuestion(_questions[getType()], inputTrue, inputFalse);
+
     window.setTimeout(updateInteraction, getInterval());
   }
 
@@ -171,6 +173,30 @@ var Interact = function() {
     mood.update(updateMood);
     console.log('Mood', mood.getMood(), mood.getInterval());
     content.actor.update(mood.getMood());
+    setResponses();
+    setQuestions();
+  }
+
+  function inputTrue() {
+    userResponse(true); 
+  }
+
+  function inputFalse() {
+    userResponse(false); 
+  }
+
+  function userResponse(input) {
+    content.displayResponse(getPositiveResponse());
+
+    if(input) {
+      request.get({
+        mood: mood.getMood(),
+        type: getType(),
+        input: 'yes'
+      }, content.display);
+    } else {
+      content.displayResponse(getNegativeResponse());
+    }
   }
   
   return {
@@ -180,6 +206,7 @@ var Interact = function() {
     getNegativeResponse: getNegativeResponse,
     startInteractionLoop: startInteractionLoop,
     startMoodLoop: startMoodLoop,
+    userResponse: userResponse,
     mood: mood,
     content: content,
     request: request

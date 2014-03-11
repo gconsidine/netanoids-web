@@ -2,7 +2,8 @@
 var Actor = function() {
   var Canvas = require('./Canvas');
 
-  var ACTOR_HEIGHT = 20;
+  var ACTOR_HEIGHT = 20,
+      BOTTOM_PADDING = 30;
 
   var _canvas,
       _startX,
@@ -20,15 +21,15 @@ var Actor = function() {
     };
 
     _startX = _fg.width / 2;
-    _startY = _fg.height - ACTOR_HEIGHT; 
+    _startY = _fg.height - BOTTOM_PADDING; 
   }());
   
   function draw(mood) {
     color = getColorFromMood(mood);
 
     _fg.ctx.beginPath();
-    _fg.ctx.moveTo(_startX, _fg.height);
-    _fg.ctx.lineTo(_startX, _startY);
+    _fg.ctx.moveTo(_startX, _startY);
+    _fg.ctx.lineTo(_startX, _startY - ACTOR_HEIGHT);
 
     _fg.ctx.strokeStyle = color;
     _fg.ctx.lineWidth = 3;
@@ -80,7 +81,7 @@ var Background = function() {
     
     _startX = _bg.width * 0.01;
     _startY = _bg.height * 0.1;
-    _hLength = _bg.width * 0.9;
+    _hLength = _bg.width * 0.96;
     _vLength = _bg.height * 0.5;
     _depth = _bg.width * 0.01,
     _shift = _depth * Math.cos(Math.PI / 180);
@@ -195,33 +196,142 @@ var Content = function() {
   Background = require('./Background');
   Actor = require('./Actor');
   
+  var PROMPT_PADDING = 100,
+      PROMPT_TIMEOUT = 10000;
+
   var background,
       actor;
+  
+  var _promptY,
+      _promptX;
+
 
   (function() {
     background = Background();  
     actor = Actor();
+
+    _promptY = Math.floor(background.y + background.height + PROMPT_PADDING);
+    _promptX = Math.floor(background.width / 2);
   }());
 
-  function displayVideo() {
-    var div = document.createElement('div');  
-    div.id = 'video';
+  function displayError() {
+    displayResponse('I couldn\'t find it.  I tried.  Seriously.');
+  }
+ 
+  function display(response, o) {
+    var json,
+        div,
+        html;
+    
+    clearContent();
+
+    try {
+      json = JSON.parse(response);
+    } catch(e) {
+      displayError();
+      return false;
+    }
+
+    if(response.error) {
+      displayError();
+      return false;
+    }
+
+    if(o.type === 'video') {
+      html = '<iframe width="' + background.width + '" height="' + background.height 
+           + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1"' 
+           + 'frameborder="0" allowfullscreen></iframe>';
+    } else if(o.type === 'image') {
+      html = response;
+    } else if(o.type === 'text') {
+      html = response; 
+    }
+
+    div = document.createElement('div');  
+    div.id = 'content';
     div.style.height = background.height + 'px';
     div.style.width = background.width + 'px';
     div.setAttribute('style', 'position: absolute; top:' + background.y + 'px; left:' + background.x + 'px;');
 
-    div.innerHTML = '<iframe width="' + background.width + '" height="' + background.height 
-                  + '" src="http://www.youtube.com/embed/OO-vG8oPhhM?autoplay=1"' 
-                  + 'frameborder="0" allowfullscreen></iframe>';
+    div.innerHTML = html;
 
     document.body.appendChild(div);
   }
 
+
+  function displayQuestion(question, inputTrue, inputFalse) {
+    clearPrompt();
+
+    var div = document.createElement('div'),
+        yesButton = document.createElement('button'),
+        noButton = document.createElement('button'),
+        html = '';
+
+    div.id = 'prompt';
+    div.setAttribute('style', 'position: absolute; top:' + _promptY + 'px; left:' + _promptX + 'px;');
+
+    yesButton.onclick = inputTrue;
+    yesButton.innerHTML = 'Yes';
+
+    noButton.onclick = inputFalse;
+    noButton.innerHTML = 'No';
+    
+    html = '<p>' + question + '</p>'
+
+    div.innerHTML = html;
+    div.appendChild(yesButton);
+    div.appendChild(noButton);
+    
+    document.body.appendChild(div);
+
+    window.setTimeout(clearPrompt, PROMPT_TIMEOUT);
+  }
+
+  function displayResponse(response) {
+    clearPrompt();
+
+    var div = document.createElement('div'),
+        html = '';
+
+    div.id = 'prompt';
+    div.setAttribute('style', 'position: absolute; top:' + _promptY + 'px; left:' + _promptX + 'px;');
+    
+    html = '<p>' + response + '</p>'
+
+    div.innerHTML = html;
+    document.body.appendChild(div);
+
+    window.setTimeout(clearPrompt, PROMPT_TIMEOUT);
+  }
+  
+  function clearPrompt() {
+    var body = document.body;
+    var prompt = document.getElementById('prompt');
+    
+    if(prompt) {
+      body.removeChild(prompt);
+    }
+  }
+
+  function clearContent() {
+    var body = document.body;
+    var content = document.getElementById('content');
+    
+    if(content) {
+      body.removeChild(content);
+    }
+  }
+
   return {
-    displayVideo: displayVideo,
+    display: display,
+    displayQuestion: displayQuestion,
+    displayResponse: displayResponse,
+    clearContent: clearContent,
+    clearPrompt: clearPrompt,
     background: background,
     actor: actor
   };
+
 };
 
 module.exports = Content;
@@ -261,7 +371,6 @@ var Interact = function() {
     
     content.background.update();
     content.actor.update(mood.getMood());
-    content.displayVideo();
   }());
 
   function setQuestions() {
@@ -277,7 +386,7 @@ var Interact = function() {
         break;
       case 'depressed':
         _questions = {
-          text: 'You probably don\'t but, want to read something I found?', 
+          text: 'You probably don\'t, but, want to read something I found?', 
           image: 'This picture bums me out... Want to look?', 
           video: 'This video would be good on a rainy day. Want to watch?'
         };
@@ -291,6 +400,11 @@ var Interact = function() {
         };
         break;
     }
+  }
+  
+  function setResponses() {
+    setPositiveResponses();
+    setNegativeResponses();
   }
 
   function setPositiveResponses() {
@@ -375,24 +489,22 @@ var Interact = function() {
     return _interval;
   }
   
-  function promptUser() {
-  }
-
-  function handleInput() {
-  }
-
   function startMoodLoop() {
-    updateInteraction();
+    updateMood();
   }
 
   function startInteractionLoop() {
-    updateMood();
+    window.setTimeout(updateInteraction, Math.floor(Math.random() * ((10 * 60 * 60) + 1000)));
   }
 
   function updateInteraction() {
     setInterval();
     setType();
+
     console.log('Interaction', getType(), getInterval());
+
+    content.displayQuestion(_questions[getType()], inputTrue, inputFalse);
+
     window.setTimeout(updateInteraction, getInterval());
   }
 
@@ -400,6 +512,30 @@ var Interact = function() {
     mood.update(updateMood);
     console.log('Mood', mood.getMood(), mood.getInterval());
     content.actor.update(mood.getMood());
+    setResponses();
+    setQuestions();
+  }
+
+  function inputTrue() {
+    userResponse(true); 
+  }
+
+  function inputFalse() {
+    userResponse(false); 
+  }
+
+  function userResponse(input) {
+    content.displayResponse(getPositiveResponse());
+
+    if(input) {
+      request.get({
+        mood: mood.getMood(),
+        type: getType(),
+        input: 'yes'
+      }, content.display);
+    } else {
+      content.displayResponse(getNegativeResponse());
+    }
   }
   
   return {
@@ -409,6 +545,7 @@ var Interact = function() {
     getNegativeResponse: getNegativeResponse,
     startInteractionLoop: startInteractionLoop,
     startMoodLoop: startMoodLoop,
+    userResponse: userResponse,
     mood: mood,
     content: content,
     request: request
@@ -419,18 +556,18 @@ var Interact = function() {
 module.exports = Interact;
 
 },{"./Content":4,"./Mood":7,"./Request":8}],6:[function(require,module,exports){
-(function () { 
+var global = (function () { 
   var Interact = require('./Interact');
 
-  var _interact;
+  var interact;
 
   var GAME_UPDATE_INTERVAL = 33;
   
   (function () {
-    _interact = Interact(); 
+    interact = Interact(); 
 
-    _interact.startMoodLoop();
-    _interact.startInteractionLoop();
+    interact.startMoodLoop();
+    interact.startInteractionLoop();
 
     window.setInterval(gameLoop, GAME_UPDATE_INTERVAL);
   }());
@@ -438,6 +575,10 @@ module.exports = Interact;
   function gameLoop() {
 
   }
+
+  return {
+    interact: interact
+  };
 
 }());
 
@@ -497,7 +638,7 @@ var Request = function() {
 
     xmlHttpRequest.onreadystatechange = function () {
       if(xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
-        callback(xmlHttpRequest.responseText);
+        callback(xmlHttpRequest.responseText, o);
       }
     }
 

@@ -24,7 +24,7 @@ var Background = function() {
     
     _startX = _bg.width * 0.01;
     _startY = _bg.height * 0.1;
-    _hLength = _bg.width * 0.9;
+    _hLength = _bg.width * 0.96;
     _vLength = _bg.height * 0.5;
     _depth = _bg.width * 0.01,
     _shift = _depth * Math.cos(Math.PI / 180);

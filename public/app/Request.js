@@ -8,7 +8,7 @@ var Request = function() {
 
     xmlHttpRequest.onreadystatechange = function () {
       if(xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
-        callback(xmlHttpRequest.responseText);
+        callback(xmlHttpRequest.responseText, o);
       }
     }
 

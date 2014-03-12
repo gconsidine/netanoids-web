@@ -1,5 +1,7 @@
 var Mood = function() {
-  
+  var MIN_TIME = 1000 * 60,     // 1 minute
+      MAX_TIME = 1000 * 60 * 3; // 3 minutes
+
   var _mood,
       _interval;
 
@@ -10,7 +12,7 @@ var Mood = function() {
   }());
 
   function setInterval() {
-    _interval = Math.floor(Math.random() * ((100 * 60 * 60) + 1000));
+    _interval = Math.floor(Math.random() * MAX_TIME + MIN_TIME);
   }
 
   function setMood() {

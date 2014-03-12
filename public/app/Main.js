@@ -1,4 +1,4 @@
-var global = (function () { 
+(function () { 
   var Interact = require('./Interact');
 
   var interact;
@@ -15,7 +15,7 @@ var global = (function () {
   }());
 
   function gameLoop() {
-
+    interact.content.actor.animate(interact.mood.getMood());
   }
 
   return {

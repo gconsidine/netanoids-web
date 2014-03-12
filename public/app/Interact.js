@@ -4,6 +4,9 @@ var Interact = function() {
       Request = require('./Request'),
       Content = require('./Content');
 
+  var MIN_TIME = 1000 * 15,       // 15 seconds
+      MAX_TIME = 1000 * 60 * 1.5; // 1 minute 30 seconds 
+
   var _questions,
       _negativeResponses,
       _positiveResponses,
@@ -139,7 +142,7 @@ var Interact = function() {
   }
 
   function setInterval() {
-    _interval = Math.floor(Math.random() * ((100 * 60 * 60) + 1000));
+    _interval = Math.floor(Math.random() * MAX_TIME + MIN_TIME);
   }
 
   function getType() {
@@ -155,7 +158,7 @@ var Interact = function() {
   }
 
   function startInteractionLoop() {
-    window.setTimeout(updateInteraction, Math.floor(Math.random() * ((10 * 60 * 60) + 1000)));
+    window.setTimeout(updateInteraction, Math.floor(Math.random() * MAX_TIME + MIN_TIME));
   }
 
   function updateInteraction() {

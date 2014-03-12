@@ -3,7 +3,7 @@ var Content = function() {
   Actor = require('./Actor');
   
   var PROMPT_PADDING = 100,
-      PROMPT_TIMEOUT = 10000;
+      PROMPT_TIMEOUT = 1000 * 10; // 10 seconds
 
   var background,
       actor;
@@ -33,6 +33,7 @@ var Content = function() {
 
     try {
       json = JSON.parse(response);
+      console.log(json);
     } catch(e) {
       displayError();
       return false;

@@ -3,33 +3,46 @@ var Actor = function() {
   var Canvas = require('./Canvas');
 
   var ACTOR_HEIGHT = 20,
-      BOTTOM_PADDING = 30;
+      BOTTOM_PADDING = 30,
+      CLEAR_SIZE = 150,
+      RECT_OFFSET = 75;
 
   var _canvas,
       _startX,
       _startY,
-      _colors;
+      _colors,
+      _bumpLimits,
+      _bumpLimit,
+      _bumpUp,
+      _bump;
 
   (function() {
     _canvas = Canvas();
     _fg = _canvas.create('actor');
+    
+    _bumpLimits = {
+      playful: 2, 
+      depressed: 0, 
+      zonked: 5
+    };
 
     _colors = {
-      playful: 'green', 
-      depressed: 'black', 
+      playful: 'purple', 
+      depressed: 'darkblue', 
       zonked: 'pink'
     };
 
     _startX = _fg.width / 2;
     _startY = _fg.height - BOTTOM_PADDING; 
+    _bumpUp = false;
+    _bump = 0;
   }());
   
-  function draw(mood) {
-    color = getColorFromMood(mood);
+  function draw(mood, color) {
+    _fg.ctx.clearRect(_startX - RECT_OFFSET, _startY - RECT_OFFSET, CLEAR_SIZE, CLEAR_SIZE);
 
     _fg.ctx.beginPath();
-    _fg.ctx.moveTo(_startX, _startY);
-    _fg.ctx.arc(_startX, _startY - ACTOR_HEIGHT, ACTOR_HEIGHT, 0, 2 * Math.PI, false);
+    _fg.ctx.arc(_startX, _startY - ACTOR_HEIGHT - _bump, ACTOR_HEIGHT, 0, 2 * Math.PI, false);
 
     _fg.ctx.strokeStyle = color;
     _fg.ctx.fillStyle = color;
@@ -42,14 +55,57 @@ var Actor = function() {
 
   function update(mood) {
     draw(mood);
+    _bumpLimit = getBumpLimit(mood);
+  }
+
+  function getBumpLimit(mood) {
+    return _bumpLimits[mood];  
   }
 
   function getColorFromMood(mood) {
     return _colors[mood]; 
   }
+
+  function animate(mood) {
+    var color = '';
+
+    // Animate up and down
+    if(_bumpUp && _bump < _bumpLimit) {
+      _bump++;
+    } else if(!_bumpUp && _bump > -_bumpLimit) {
+      _bump--;
+    } else if(!_bumpUp && _bump <= -_bumpLimit) {
+      _bumpUp = true;
+    } else {
+      _bumpUp = false;
+    }
+
+    // Psychedelicized
+    if(mood === 'zonked') {
+      color = getRandomColor();
+    } else {
+      color = getColorFromMood(mood);
+    }
+
+    draw(mood, color);
+  }
+
+  function getRandomColor() {
+    colorInt = Math.floor(Math.random() * Math.pow(16, 4) * 100);
+    colorHex = colorInt.toString(16);
+
+    if(colorHex.length < 6) {
+      for(var i = colorHex.length; i < 6; i++) {
+        colorHex = '0' + colorHex;
+      }
+    }
+    
+    return '#' + colorHex;
+  }
   
   return {
-    update: update
+    update: update,
+    animate: animate
   };
  
 };
@@ -199,7 +255,7 @@ var Content = function() {
   Actor = require('./Actor');
   
   var PROMPT_PADDING = 100,
-      PROMPT_TIMEOUT = 10000;
+      PROMPT_TIMEOUT = 1000 * 10; // 10 seconds
 
   var background,
       actor;
@@ -229,6 +285,7 @@ var Content = function() {
 
     try {
       json = JSON.parse(response);
+      console.log(json);
     } catch(e) {
       displayError();
       return false;
@@ -352,6 +409,9 @@ var Interact = function() {
   var Mood = require('./Mood'),
       Request = require('./Request'),
       Content = require('./Content');
+
+  var MIN_TIME = 1000 * 15,       // 15 seconds
+      MAX_TIME = 1000 * 60 * 1.5; // 1 minute 30 seconds 
 
   var _questions,
       _negativeResponses,
@@ -488,7 +548,7 @@ var Interact = function() {
   }
 
   function setInterval() {
-    _interval = Math.floor(Math.random() * ((100 * 60 * 60) + 1000));
+    _interval = Math.floor(Math.random() * MAX_TIME + MIN_TIME);
   }
 
   function getType() {
@@ -504,7 +564,7 @@ var Interact = function() {
   }
 
   function startInteractionLoop() {
-    window.setTimeout(updateInteraction, Math.floor(Math.random() * ((10 * 60 * 60) + 1000)));
+    window.setTimeout(updateInteraction, Math.floor(Math.random() * MAX_TIME + MIN_TIME));
   }
 
   function updateInteraction() {
@@ -566,7 +626,7 @@ var Interact = function() {
 module.exports = Interact;
 
 },{"./Content":4,"./Mood":7,"./Request":8}],6:[function(require,module,exports){
-var global = (function () { 
+(function () { 
   var Interact = require('./Interact');
 
   var interact;
@@ -583,7 +643,7 @@ var global = (function () {
   }());
 
   function gameLoop() {
-
+    interact.content.actor.animate(interact.mood.getMood());
   }
 
   return {
@@ -594,7 +654,9 @@ var global = (function () {
 
 },{"./Interact":5}],7:[function(require,module,exports){
 var Mood = function() {
-  
+  var MIN_TIME = 1000 * 60,     // 1 minute
+      MAX_TIME = 1000 * 60 * 3; // 3 minutes
+
   var _mood,
       _interval;
 
@@ -605,7 +667,7 @@ var Mood = function() {
   }());
 
   function setInterval() {
-    _interval = Math.floor(Math.random() * ((100 * 60 * 60) + 1000));
+    _interval = Math.floor(Math.random() * MAX_TIME + MIN_TIME);
   }
 
   function setMood() {

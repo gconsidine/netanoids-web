@@ -456,7 +456,7 @@ var Interact = function() {
         break;
       case 'depressed':
         _questions = {
-          text: 'You probably don\'t, but, want to read something I found?', 
+          text: '...want to read somethi\'?', 
           image: 'This picture bums me out... Want to look?', 
           video: 'This video would be good on a rainy day. Want to watch?'
         };
@@ -483,14 +483,14 @@ var Interact = function() {
     switch(currentMood){
       case 'playful':
          _positiveResponses = {
-          text: '::squeee:: One sec. I\'ll read it to you', 
+          text: '::squeee:: One sec. I\'ll project it for you', 
           image: 'Yay. Just a sec, let me project it', 
           video: 'Awesome.  I\'ll put it up on the projector'
         };
         break;
       case 'depressed':
         _positiveResponses = {
-          text: 'Oh? Ok. I guess I\'ll read it.', 
+          text: 'Oh? Ok. I guess I\'ll put it up.', 
           image: 'Ok. Don\'t get upset if you don\'t like it.', 
           video: 'Eh. Ok.  I\'ll project it, I guess.'
         };
@@ -498,7 +498,7 @@ var Interact = function() {
         break;
       case 'zonked':
         _positiveResponses = {
-          text: '::giggles:: Okay, okay.  Let me read. ::clears throat::', 
+          text: '::giggles:: Okay, okay.  Let me get it ready.', 
           image: '::stares off into the distance:: ... Oh! I\'ll turn on the projector!', 
           video: 'Hooray!  I think I can get this to work.  One sec.'
         };
